@@ -15,6 +15,7 @@ with open('../dataset/glove.840B.300d.txt', 'r') as glove_file:
     word = line_arr[0]
     vector = json.dumps(line_arr[1:])
     rows.append([word, vector])
+    print('word:', word)
 
 with db.cursor(pymysql.cursors.DictCursor) as cursor:
   cursor.executemany(
