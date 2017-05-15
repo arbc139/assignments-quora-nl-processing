@@ -3,10 +3,12 @@
 import json
 import pymysql
 
+INPUT_FILE = sys.argv[1]
+
 db = pymysql.connect(host='localhost', user='root', password='', db='ai', charset='utf8')
 
 rows = []
-with open('../dataset/glove.840B.300d.txt', 'r') as glove_file:
+with open(INPUT_FILE, 'r') as glove_file:
   while True:
     line = glove_file.readline()
     if not line:
@@ -16,6 +18,7 @@ with open('../dataset/glove.840B.300d.txt', 'r') as glove_file:
     vector = json.dumps(line_arr[1:])
     rows.append([word, vector])
     print('word:', word)
+    break
 
 with db.cursor(pymysql.cursors.DictCursor) as cursor:
   cursor.executemany(
