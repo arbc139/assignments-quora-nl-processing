@@ -19,7 +19,7 @@ with open('../dataset/glove.840B.300d.txt', 'r') as glove_file:
 
 with db.cursor(pymysql.cursors.DictCursor) as cursor:
   cursor.executemany(
-    'INSERT INTO GLOVE (name, vector) VALUES (%s, %s)',
+    'INSERT INTO GLOVE (word, vector) VALUES (%s, %s)',
     rows
   )
   db.commit()
