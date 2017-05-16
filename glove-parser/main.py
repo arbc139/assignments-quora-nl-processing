@@ -25,6 +25,9 @@ def is_float(number):
     return False
   return True
 
+def is_utf8(word):
+  return isinstance(word, str) or isinstance(word, unicode)
+
 rows = []
 with open(options.input_file, 'r') as glove_file:
   while True:
@@ -38,6 +41,10 @@ with open(options.input_file, 'r') as glove_file:
 
     if len(line_arr[word_element_count:]) != options.dimension:
       raise RuntimeError('Vector dimension is not equal to parameter')
+    
+    if not is_utf8(word):
+      print('word is not utf8:', word)
+      continue
 
     rows.append([word, vector])
     print('word:', word)
