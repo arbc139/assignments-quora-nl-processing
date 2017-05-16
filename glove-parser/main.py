@@ -42,11 +42,10 @@ with open(options.input_file, 'r') as glove_file:
     rows.append([word, vector])
     print('word:', word)
     print('vector dimension:', len(line_arr[word_element_count:]))
-"""
+
 with db.cursor(pymysql.cursors.DictCursor) as cursor:
   cursor.executemany(
     'INSERT INTO GLOVE (word, vector) VALUES (%s, %s)',
     rows
   )
-  db.commit()
-"""
+db.commit()
