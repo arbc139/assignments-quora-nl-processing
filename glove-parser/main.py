@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import json
-#import pymysql
+import pymysql
 import re
 import sys
 
@@ -16,7 +16,7 @@ def parse_commands(argv):
 
 options = parse_commands(sys.argv[1:])
 
-#db = pymysql.connect(host='localhost', user='root', password='', db='ai', charset='utf8')
+db = pymysql.connect(host='localhost', user='root', password='', db='ai', charset='utf8')
 
 def is_float(number):
   try:
