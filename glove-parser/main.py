@@ -48,6 +48,7 @@ with open(options.input_file, 'r') as glove_file:
       continue
 
     words.append(word)
+    vector = [re.sub('\'', '', value) for value in vector]
     vectors.append(vector)
     print('word:', word)
     print('vector dimension:', len(line_arr[word_element_count:]))
