@@ -76,7 +76,7 @@ for i in range(0, len(word)):
 
 with db.cursor(pymysql.cursors.DictCursor) as cursor:
   cursor.executemany(
-    'INSERT INTO GLOVE (word, vector_id) VALUES (%s, %s)',
+    'INSERT INTO WORD2VEC (word, vector_id) VALUES (%s, %s)',
     rows
   )
 db.commit()
