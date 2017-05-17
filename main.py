@@ -2,6 +2,7 @@
 import gensim
 import nltk
 import string
+import sys
 
 def parse_commands(argv):
   from optparse import OptionParser
