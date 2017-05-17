@@ -46,5 +46,5 @@ sentence = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?
 chunked_tokens = nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence)))
 print(filter_NNP_from_chunk_tree(chunked_tokens))
 
-model = gensim.models.word2vec(options.model_path)
+model = gensim.scripts.glove2word2vec.get_glove_info(options.model_path)
 print(model['iPad'])
