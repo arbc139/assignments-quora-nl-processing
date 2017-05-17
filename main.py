@@ -1,5 +1,17 @@
+
+import gensim
 import nltk
 import string
+
+def parse_commands(argv):
+  from optparse import OptionParser
+  parser = OptionParser('"')
+  parser.add_option('-m', '--modelPath', dest='model_path')
+
+  options, otherjunk = parser.parse_args(argv)
+  return options
+
+options = parse_commands(sys.argv[1:])
 
 def get_tokens(sentence):
   # Make lower, remove punctuation.
@@ -32,3 +44,6 @@ sentence = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?
 #sentence = 'How does the Surface Pro himself 4 compare with iPad Pro?'
 chunked_tokens = nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence)))
 print(filter_NNP_from_chunk_tree(chunked_tokens))
+
+model = gensim.models.word2vec.load_word2vec_format(options.model_path, binary=False)
+print(model['iPad'])
