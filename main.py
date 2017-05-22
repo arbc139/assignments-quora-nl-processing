@@ -108,12 +108,12 @@ model = gensim.models.KeyedVectors.load_word2vec_format(options.model_path, bina
 STOPWORDS = nltk.corpus.stopwords.words('english')
 
 sentence1 = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?'
-sentence1_words = filter_words_not_in_model(filter_NNP_from_chunk_tree(
+sentence1_words = filter_words_not_in_model(model, filter_NNP_from_chunk_tree(
   STOPWORDS,
   nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence1)))
 ))
 sentence2 = 'How does the Surface Pro himself 4 compare with iPad Pro?'
-sentence2_words = filter_words_not_in_model(filter_NNP_from_chunk_tree(
+sentence2_words = filter_words_not_in_model(model, filter_NNP_from_chunk_tree(
   STOPWORDS,
   nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
 ))
