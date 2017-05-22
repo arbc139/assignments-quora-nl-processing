@@ -61,6 +61,9 @@ def cosine_distance(vector1, vector2):
     return 0
   return np.dot(vector1, vector2) / (magnitude1 * magnitude2)
 
+def filter_words_not_in_model(model, words):
+  return list(filter(lambda word: word in model.vocab, words))
+
 def get_features(model, sentence1, sentence2):
   features = dict()
   
@@ -81,8 +84,6 @@ def get_features(model, sentence1, sentence2):
   max_similarity = 0
   for word1 in sentence1:
     for word2 in sentence2:
-      if not word1 in model.vocab or not word2 in model.vocab:
-        continue
       similarity = model.similarity(word1, word2)
       if similarity > max_similarity:
         max_similarity = similarity
@@ -93,12 +94,10 @@ def get_features(model, sentence1, sentence2):
   count = 0
   for word1 in sentence1:
     for word2 in sentence2:
-      if not word1 in model.vocab or not word2 in model.vocab:
-        continue
       similarity = model.similarity(word1, word2)
       if similarity >= alpha:
         count += 1
-  features['similarity_count'] = count / (len(sentence1) * len(sentence2))
+  features['similarity_count'] = count
 
   print(features)
   print(features.values())
@@ -109,14 +108,14 @@ model = gensim.models.KeyedVectors.load_word2vec_format(options.model_path, bina
 STOPWORDS = nltk.corpus.stopwords.words('english')
 
 sentence1 = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?'
-sentence1_words = filter_NNP_from_chunk_tree(
+sentence1_words = filter_words_not_in_model(filter_NNP_from_chunk_tree(
   STOPWORDS,
   nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence1)))
-)
+))
 sentence2 = 'How does the Surface Pro himself 4 compare with iPad Pro?'
-sentence2_words = filter_NNP_from_chunk_tree(
+sentence2_words = filter_words_not_in_model(filter_NNP_from_chunk_tree(
   STOPWORDS,
   nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
-)
+))
 
 get_features(model, sentence1_words, sentence2_words)
