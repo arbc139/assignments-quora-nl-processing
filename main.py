@@ -9,13 +9,13 @@ import time
 from csv_manager import CsvWriter, CsvReader
 from sklearn import svm
 
-elapsed_millis = get_current_millis()
-STOPWORDS = nltk.corpus.stopwords.words('english')
-print('Get stop word time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
-
 get_current_millis = lambda: int(round(time.time() * 1000))
 def get_elapsed_seconds(current_time, elapsed_millis):
   return (current_time - elapsed_millis) / 1000.0
+
+elapsed_millis = get_current_millis()
+STOPWORDS = nltk.corpus.stopwords.words('english')
+print('Get stop word time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
 def parse_commands(argv):
   from optparse import OptionParser
