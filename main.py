@@ -140,7 +140,6 @@ train_data = None
 with open(options.train_file, 'r') as train_file:
   csv_reader = CsvReader(train_file)
   train_data = csv_reader.get_dict_list_data()
-print(train_data)
 print('Get train data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
 elapsed_millis = get_current_millis()
