@@ -1,2 +1,4 @@
 gensim
 nltk
+numpy
+sklearn
