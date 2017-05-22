@@ -105,7 +105,7 @@ def get_features(model, sentence1, sentence2):
   return features
   
 
-model = gensim.models.Word2Vec.load_word2vec_format(options.model_path, binary=True)
+model = gensim.models.KeyedVectors.load_word2vec_format(options.model_path, binary=True)
 STOPWORDS = nltk.corpus.stopwords.words('english')
 
 sentence1 = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?'
