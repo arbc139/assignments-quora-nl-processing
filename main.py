@@ -163,8 +163,10 @@ svc.fit(train_features, train_results)
 print('Train svm time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
 elapsed_millis = get_current_millis()
+test_ids = []
 test_features = []
 for test in test_data:
+  test_ids.append(test['test_id'])
   test_features.append(make_sentences_to_features(model, test['question1'], test['question2']))
 print('Convert test data to features time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
@@ -176,9 +178,9 @@ elapsed_millis = get_current_millis()
 with open(options.submission_file, 'w+') as submission_file:
   csv_writer = CsvWriter(submission_file, ['test_id', 'is_duplicate'])
   csv_writer.write_header()
-  for result in test_results:
+  for test_id, result in zip(test_ids, test_results):
     csv_writer.write_row({
-      'test_id': test['test_id'],
+      'test_id': test_id,
       'is_duplicate': result,
     })
 print('Write submission file time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
