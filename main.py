@@ -87,7 +87,7 @@ def get_features(model, sentence1, sentence2):
       if similarity > max_similarity:
         max_similarity = similarity
   features['max_similarity'] = max_similarity
-  
+
   # Third Feature. Count of similarity words
   alpha = 0.6
   count = 0
@@ -98,7 +98,7 @@ def get_features(model, sentence1, sentence2):
       similarity = model.similarity(word1, word2)
       if similarity >= alpha:
         count += 1
-  features['similarity_count'] = count
+  features['similarity_count'] = count / (len(sentence1) * len(sentence2))
 
   print(features)
   print(features.values())
