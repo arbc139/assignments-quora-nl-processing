@@ -33,7 +33,7 @@ def filter_NNP_from_chunk_tree(stopwords, tree):
       continue
     
     if type(subtree) == nltk.tree.Tree:
-      subtree_result = filter_NNP_from_chunk_tree(subtree)
+      subtree_result = filter_NNP_from_chunk_tree(stopwords, subtree)
       result.append('_'.join(subtree_result))
       continue
     
