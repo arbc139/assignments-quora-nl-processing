@@ -52,7 +52,6 @@ def filter_NNP_from_chunk_tree(stopwords, tree):
       result.append('_'.join(subtree_result))
       continue
     
-    print('not stopwords:', subtree[0])
     result.append(subtree[0])
   return result
 
@@ -111,10 +110,11 @@ def get_features(model, sentence1, sentence2):
       similarity = model.similarity(word1, word2)
       if similarity >= alpha:
         count += 1
-  features['similarity_count'] = count / (len(sentence1) * len(sentence2))
+  if len(sentence1) == 0 or len(sentence2) == 0:
+    features['similarity_count'] = 0
+  else:
+    features['similarity_count'] = count / (len(sentence1) * len(sentence2))
 
-  print(features)
-  print(list(features.values()))
   return features
 
 def make_sentences_to_features(model, sentence1, sentence2):
