@@ -4,10 +4,25 @@ import nltk
 import numpy as np
 import string
 import sys
+import time
+
+from csv_manager import CsvWriter, CsvReader
+from sklearn import svm
+
+elapsed_millis = get_current_millis()
+STOPWORDS = nltk.corpus.stopwords.words('english')
+print('Get stop word time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+
+get_current_millis = lambda: int(round(time.time() * 1000))
+def get_elapsed_seconds(current_time, elapsed_millis):
+  return (current_time - elapsed_millis) / 1000.0
 
 def parse_commands(argv):
   from optparse import OptionParser
   parser = OptionParser('"')
+  parser.add_option('--testFile', dest='test_file')
+  parser.add_option('--trainFile', dest='train_file')
+  parser.add_option('-o', '--submissionFile', dest='submission_file')
   parser.add_option('-m', '--modelPath', dest='model_path')
 
   options, otherjunk = parser.parse_args(argv)
@@ -40,7 +55,6 @@ def filter_NNP_from_chunk_tree(stopwords, tree):
     print('not stopwords:', subtree[0])
     result.append(subtree[0])
   return result
-
 
 def get_word_vector(model, word):
   try:
@@ -100,22 +114,72 @@ def get_features(model, sentence1, sentence2):
   features['similarity_count'] = count / (len(sentence1) * len(sentence2))
 
   print(features)
-  print(features.values())
+  print(list(features.values()))
   return features
-  
 
+def make_sentences_to_features(model, sentence1, sentence2):
+  # sentence1 = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?'
+  sentence1_words = filter_words_not_in_model(model, filter_NNP_from_chunk_tree(
+    STOPWORDS,
+    nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence1)))
+  ))
+  # sentence2 = 'How does the Surface Pro himself 4 compare with iPad Pro?'
+  sentence2_words = filter_words_not_in_model(model, filter_NNP_from_chunk_tree(
+    STOPWORDS,
+    nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
+  ))
+
+  get_features(model, sentence1_words, sentence2_words)
+
+elapsed_millis = get_current_millis()
 model = gensim.models.KeyedVectors.load_word2vec_format(options.model_path, binary=True)
-STOPWORDS = nltk.corpus.stopwords.words('english')
+print('Making word2vec model time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
-sentence1 = 'Why did Microsoft choose core m3 and not core i3 home Surface Pro 4?'
-sentence1_words = filter_words_not_in_model(model, filter_NNP_from_chunk_tree(
-  STOPWORDS,
-  nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence1)))
-))
-sentence2 = 'How does the Surface Pro himself 4 compare with iPad Pro?'
-sentence2_words = filter_words_not_in_model(model, filter_NNP_from_chunk_tree(
-  STOPWORDS,
-  nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
-))
+elapsed_millis = get_current_millis()
+train_data = None
+with open(options.train_file, 'r') as train_file:
+  csv_reader = CsvReader(train_file)
+  train_data = csv_reader.get_dict_list_data()
+print(train_data)
+print('Get train data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
-get_features(model, sentence1_words, sentence2_words)
+elapsed_millis = get_current_millis()
+test_data = None
+with open(options.test_file, 'r') as test_file:
+  csv_reader = CsvReader(test_file)
+  test_data = csv_reader.get_dict_list_data()
+print('Get test data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+
+elapsed_millis = get_current_millis()
+train_features = []
+train_results = []
+for train in train_data:
+  train_features.append(make_sentences_to_features(model, train['question1'], train['question2']))
+  train_results.append(int(train['is_duplicate']))
+print('Convert train data to features time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+
+elapsed_millis = get_current_millis()
+svc = svm.SVC(kernel='linear')
+svc.fit(train_features, train_results)
+print('Train svm time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+
+elapsed_millis = get_current_millis()
+test_features = []
+for test in test_data:
+  test_features.append(make_sentences_to_features(model, test['question1'], test['question2']))
+print('Convert test data to features time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+
+elapsed_millis = get_current_millis()
+test_results = svc.predict(test_features)
+print('Predict test data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+
+elapsed_millis = get_current_millis()
+with open(options.submission_file, 'w+') as submission_file:
+  csv_writer = CsvWriter(submission_file, ['test_id', 'is_duplicate'])
+  csv_writer.write_header()
+  for result in test_results:
+    csv_writer.write_row({
+      'test_id': test['test_id'],
+      'is_duplicate': result,
+    })
+print('Write submission file time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
