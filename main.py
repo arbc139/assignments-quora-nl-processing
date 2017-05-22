@@ -7,7 +7,6 @@ import sys
 import time
 
 from csv_manager import CsvWriter, CsvReader
-from nltk.stem import 
 from sklearn import svm
 
 lemmatizer = nltk.stem.WordNetLemmatizer()
