@@ -92,7 +92,7 @@ def get_features(model, sentence1, sentence2):
   alpha = 0.6
   count = 0
   for word1 in sentence1:
-    for word2 in sentece2:
+    for word2 in sentence2:
       if not word1 in model.vocab or not word2 in model.vocab:
         continue
       similarity = model.similarity(word1, word2)
