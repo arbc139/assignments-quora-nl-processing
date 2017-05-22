@@ -68,14 +68,14 @@ def get_features(model, sentence1, sentence2):
   sentence1_vector = np.zeros(300)
   for word in sentence1:
     sentence1_vector = np.add(sentence1_vector, get_word_vector(model, word))
-  normalized_sentence1_vector = normalize_array(sentence1_vector)
+  normalized_sentence1_vector = normalize_vector(sentence1_vector)
   
   sentence2_vector = np.zeros(300)
   for word in sentence2:
     sentence2_vector = np.add(sentence2_vector, get_word_vector(model, word))
-  normalized_sentence2_vector = normalize_array(sentence2_vector)
+  normalized_sentence2_vector = normalize_vector(sentence2_vector)
 
-  features['sentence_similarity'] = np.dot(sentence1_vector, sentence2_vector)
+  features['sentence_similarity'] = cosine_distance(sentence1_vector, sentence2_vector)
   
   # Second Feature. Max similarity.
   max_similarity = 0
