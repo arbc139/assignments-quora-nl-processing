@@ -7,7 +7,10 @@ import sys
 import time
 
 from csv_manager import CsvWriter, CsvReader
+from nltk.stem import 
 from sklearn import svm
+
+lemmatizer = nltk.stem.WordNetLemmatizer()
 
 get_current_millis = lambda: int(round(time.time() * 1000))
 def get_elapsed_seconds(current_time, elapsed_millis):
@@ -44,7 +47,11 @@ def filter_NNP_from_chunk_tree(stopwords, tree):
   result = []
   for subtree in tree:
     if type(subtree) != nltk.tree.Tree and \
-      (subtree[0].lower() in stopwords or subtree[1] == '.'):
+      (
+        subtree[0].lower() in stopwords or \
+        len(subtree[0]) < 2 or \
+        subtree[1] == '.'
+      ):
       continue
     
     if type(subtree) == nltk.tree.Tree:
@@ -52,7 +59,7 @@ def filter_NNP_from_chunk_tree(stopwords, tree):
       result.append('_'.join(subtree_result))
       continue
     
-    result.append(subtree[0])
+    result.append(lemmatizer.lemmatize(subtree[0]))
   return result
 
 def get_word_vector(model, word):
@@ -128,6 +135,8 @@ def make_sentences_to_features(model, sentence1, sentence2):
     STOPWORDS,
     nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
   ))
+
+  print(sentence1_words, sentence2_words)
 
   return list(get_features(model, sentence1_words, sentence2_words).values())
 
