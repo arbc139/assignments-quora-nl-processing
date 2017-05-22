@@ -98,7 +98,7 @@ def get_features(model, sentence1, sentence2):
       similarity = model.similarity(word1, word2)
       if similarity >= alpha:
         count += 1
-  feature['similarity_count'] = count
+  features['similarity_count'] = count
 
   print(features)
   print(features.values())
