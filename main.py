@@ -59,7 +59,7 @@ def cosine_distance(vector1, vector2):
   magnitude2 = np.linalg.norm(vector2)
   if magnitude1 * magnitude2 == 0:
     return 0
-  return np.dot(sentence1_vector, sentence2_vector) / (magnitude1 * magnitude2)
+  return np.dot(vector1, vector2) / (magnitude1 * magnitude2)
 
 def get_features(model, sentence1, sentence2):
   features = dict()
