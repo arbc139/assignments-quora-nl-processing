@@ -129,7 +129,7 @@ def make_sentences_to_features(model, sentence1, sentence2):
     nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
   ))
 
-  get_features(model, sentence1_words, sentence2_words)
+  return get_features(model, sentence1_words, sentence2_words)
 
 elapsed_millis = get_current_millis()
 model = gensim.models.KeyedVectors.load_word2vec_format(options.model_path, binary=True)
