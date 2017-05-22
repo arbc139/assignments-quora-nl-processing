@@ -99,6 +99,7 @@ def get_features(model, sentence1, sentence2):
 
   features['sentence_similarity'] = cosine_distance(sentence1_vector, sentence2_vector)
   
+  """
   # Second Feature. Max similarity.
   max_similarity = 0
   for word1 in sentence1:
@@ -107,6 +108,7 @@ def get_features(model, sentence1, sentence2):
       if similarity > max_similarity:
         max_similarity = similarity
   features['max_similarity'] = max_similarity
+  """
 
   # Third Feature. Count of similarity words
   alpha = 0.6
@@ -134,8 +136,6 @@ def make_sentences_to_features(model, sentence1, sentence2):
     STOPWORDS,
     nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
   ))
-
-  print(sentence1_words, sentence2_words)
 
   return list(get_features(model, sentence1_words, sentence2_words).values())
 
