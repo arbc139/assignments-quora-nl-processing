@@ -116,7 +116,7 @@ sentence1_words = filter_NNP_from_chunk_tree(
 sentence2 = 'How does the Surface Pro himself 4 compare with iPad Pro?'
 sentence2_words = filter_NNP_from_chunk_tree(
   STOPWORDS,
-  nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence)))
+  nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence2)))
 )
 
 get_features(model, sentence1_words, sentence2_words)
