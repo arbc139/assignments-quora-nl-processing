@@ -43,7 +43,7 @@ def filter_NNP_from_chunk_tree(stopwords, tree):
       result.append('_'.join(subtree_result))
       continue
     
-    result.append(lemmatizer.lemmatize(subtree[0]))
+    result.append(lemmatizer.lemmatize(subtree[0].lower()))
   return result
 
 
