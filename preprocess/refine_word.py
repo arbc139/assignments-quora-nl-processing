@@ -6,6 +6,8 @@ import nltk
 from custom_library.csv_manager import CsvReader, CsvWriter
 from custom_library.utils import get_current_millis, get_elapsed_seconds
 
+lemmatizer = nltk.stem.WordNetLemmatizer()
+
 def parse_commands(argv):
   from optparse import OptionParser
   parser = OptionParser('"')
