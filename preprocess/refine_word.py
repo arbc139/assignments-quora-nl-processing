@@ -98,8 +98,8 @@ with open(options.refine_train_file, 'w+') as refine_train_file:
 print('Write refine train data file time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
 elapsed_millis = get_current_millis()
-with open(options.refine_train_file, 'w+') as refine_test_file:
-  csv_writer = CsvWriter(refine_train_file, ['test_id', 'question1', 'question2'])
+with open(options.refine_test_file, 'w+') as refine_test_file:
+  csv_writer = CsvWriter(refine_test_file, ['test_id', 'question1', 'question2'])
   csv_writer.write_header()
   for test in refined_test_data:
     csv_writer.write_row(test)
