@@ -10,6 +10,7 @@ import sys
 
 from collections import Counter
 from sklearn import cross_validation
+from custom_library.utils import get_current_millis, get_elapsed_seconds
 
 STOPWORDS = set(nltk.corpus.stopwords.words('english'))
 
@@ -25,12 +26,14 @@ def parse_commands(argv):
 
 options = parse_commands(sys.argv[1:])
 
+elapsed_millis = get_current_millis()
 # Step0. Gets train data and test data
 train_data = pd.read_csv(options.train_file)
 test_data = pd.read_csv(options.test_file)
 
 train_questions = pd.Series(train_data['question1'].tolist() + train_data['question2'].tolist()).astype(str)
 test_questions = pd.Series(test_data['question1'].tolist() + test_data['question2'].tolist()).astype(str)
+print('Step0: Get train, test data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
 # Step1. Calculates word match feature.
 def word_match_share(row):
@@ -93,6 +96,7 @@ def tfidf_word_match_share(row):
   
   return np.sum(shared_weights) / np.sum(total_weights)
 
+elapsed_millis = get_current_millis()
 # Step4. Reblancing data
 # First we create our training and testing data
 X_train = pd.DataFrame()
@@ -106,7 +110,9 @@ y_train = train_data['is_duplicate'].values
 
 pos_train = X_train[y_train == 1]
 neg_train = X_train[y_train == 0]
+print('Step4: Rebalancing data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
+elapsed_millis = get_current_millis()
 # Step5. Over sampling
 # Now we oversample the negative class
 # There is likely a much more elegant way to do this...
@@ -121,11 +127,15 @@ print(len(pos_train) / (len(pos_train) + len(neg_train)))
 X_train = pd.concat([pos_train, neg_train])
 y_train = (np.zeros(len(pos_train)) + 1).tolist() + np.zeros(len(neg_train)).tolist()
 del pos_train, neg_train
+print('Step5: Over sampling time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
+elapsed_millis = get_current_millis()
 # Step6. Split train data to create validation data
 # Finally, we split some of the data off for validation
 X_train, X_valid, y_train, y_valid = cross_validation.train_test_split(X_train, y_train, test_size=0.2, random_state=4242)
+print('Step6: Split validation data from train data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
 
+elapsed_millis = get_current_millis()
 # Step7. Run XGBoost algorithm.
 import xgboost as xgb
 
@@ -150,3 +160,5 @@ sub = pd.DataFrame()
 sub['test_id'] = test_data['test_id']
 sub['is_duplicate'] = p_test
 sub.to_csv(options.submission_file, index=False)
+print('Step7: Run XGBoost time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+print('Done.')
