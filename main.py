@@ -143,10 +143,10 @@ watchlist = [(d_train, 'train'), (d_valid, 'valid')]
 
 bst = xgb.train(params, d_train, 400, watchlist, early_stopping_rounds=50, verbose_eval=10)
 
-d_test = xgb.DMatrix(x_test)
+d_test = xgb.DMatrix(X_test)
 p_test = bst.predict(d_test)
 
 sub = pd.DataFrame()
-sub['test_id'] = df_test['test_id']
+sub['test_id'] = test_data['test_id']
 sub['is_duplicate'] = p_test
 sub.to_csv(options.submission_file, index=False)
