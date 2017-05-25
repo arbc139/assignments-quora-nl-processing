@@ -21,7 +21,7 @@ class XgbManager():
       verbose_eval=options['verbose_eval'])
   
   def predict(self):
-    if not booster:
+    if not self.booster:
       raise RuntimeError('XgbManager: Try predict before train!')
     return self.booster.predict(self.D_test)
   
