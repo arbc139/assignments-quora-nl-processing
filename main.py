@@ -62,13 +62,16 @@ params = {
   'eta': 0.02,
   'max_depth': 4,
 }
-# Set our options for xgboost
+# Set our parametic options for xgboost
 options = {
-  'num_boost_round': 400,
+  # Activates early stopping.
   'early_stopping_rounds': 50,
+  # The evaluation metric on the validation set is printed at every given verbose_eval boosting stage.
   'verbose_eval': 10,
 }
-xgb.train(params, options)
+# Number of boosting iterations.
+num_boost_round = 400
+xgb.train(params, options, num_boost_round)
 y_test = xgb.predict()
 time_logger.log_with_elapse('Step4, Run XGBoost time:')
 

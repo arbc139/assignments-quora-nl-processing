@@ -8,16 +8,15 @@ class XgbManager():
     self.D_test = xgb.DMatrix(X_test)
     self.booster = None
   
-  def train(self, params, options):
+  def train(self, params, options, num_boost_round=400):
     # Default values
     options = {
-      'num_boost_round': 400 if not options['num_boost_round'] else options['num_boost_round'],
       'early_stopping_rounds': 50 if not options['early_stopping_rounds'] else options['early_stopping_rounds'],
       'verbose_eval': 10 if not options['verbose_eval'] else options['verbose_eval'],
     }
     watchlist = [(self.D_train, 'train'), (self.D_valid, 'valid')]
     self.booster = xgb.train(
-      params, self.D_train, options['num_boost_round'], watchlist,
+      params, self.D_train, num_boost_round, watchlist,
       early_stopping_rounds=options['early_stopping_rounds'],
       verbose_eval=options['verbose_eval'])
   
