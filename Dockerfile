@@ -1,9 +1,8 @@
 FROM parrotprediction/course-xgboost
 MAINTAINER Do yeong Kim <arbc139@gmail.com>
 
-# Run upgrades
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
-RUN apt-get update
+# pip upgrade
+RUN pip install --upgrade pip
 
 # Install my works
 RUN git clone https://github.com/arbc139/quora-nl-processing
