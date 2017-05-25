@@ -1,164 +1,82 @@
 # This is refered by anokas's Data Analysis & XGBoost Starter (0.35460 LB)
 # https://www.kaggle.com/anokas/data-analysis-xgboost-starter-0-35460-lb
 
-import gc
+import copy
 import nltk
 import numpy as np
-import os
 import pandas as pd
 import sys
 
 from collections import Counter
+from custom_library.utils import get_current_millis, get_elapsed_seconds, parse_commands
+from feature_extracter import FeatureExtracter
+from oversampler import OverSampler
+from time_logger import TimeLogger
 from sklearn import cross_validation
-from custom_library.utils import get_current_millis, get_elapsed_seconds
-
-STOPWORDS = set(nltk.corpus.stopwords.words('english'))
-
-def parse_commands(argv):
-  from optparse import OptionParser
-  parser = OptionParser('"')
-  parser.add_option('--testFile', dest='test_file')
-  parser.add_option('--trainFile', dest='train_file')
-  parser.add_option('--submissionFile', dest='submission_file')
-
-  options, otherjunk = parser.parse_args(argv)
-  return options
+from xgb_manager import XgbManager
 
 options = parse_commands(sys.argv[1:])
+time_logger = TimeLogger()
 
-elapsed_millis = get_current_millis()
 # Step0. Gets train data and test data
+time_logger.start()
 train_data = pd.read_csv(options.train_file)
 test_data = pd.read_csv(options.test_file)
-
 train_questions = pd.Series(train_data['question1'].tolist() + train_data['question2'].tolist()).astype(str)
 test_questions = pd.Series(test_data['question1'].tolist() + test_data['question2'].tolist()).astype(str)
-print('Step0: Get train, test data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+time_logger.log_with_elapse('Step0, Get train, test data time:')
 
-# Step1. Calculates word match feature.
-def word_match_share(row):
-  question1_words = {}
-  question2_words = {}
-  for word in str(row['question1']).lower().split():
-    if word not in STOPWORDS:
-      question1_words[word] = 1
-  for word in str(row['question2']).lower().split():
-    if word not in STOPWORDS:
-      question2_words[word] = 1
-  if len(question1_words) == 0 or len(question2_words) == 0:
-    # The computer-generated chaff includes a few questions that are nothing but stopwords
-    return 0
-  shared_words_in_q1 = [
-    word for word in question1_words.keys() if word in question2_words
-  ]
-  shared_words_in_q2 = [
-    word for word in question2_words.keys() if word in question1_words
-  ]
-  return (len(shared_words_in_q1) + len(shared_words_in_q2)) / (len(question1_words) + len(question2_words))
+fe = FeatureExtracter(train_questions)
 
-# Step2. Calculates train word weights feature.
-# If a word appears only once, we ignore it completely (likely a typo)
-# Epsilon defines a smoothing constant, which makes the effect of extremely rare words smaller
-def get_weight(count, eps=10000, min_count=2):
-  if count < min_count:
-    return 0
-  return 1 / (count + eps)
-
-eps = 5000
-words = (' '.join(train_questions)).lower().split()
-counts = Counter(words)
-weights = { word: get_weight(count) for word, count in counts.items() }
-
-# Step3. Calculates tf-idf weights feature.
-def tfidf_word_match_share(row):
-  question1_words = {}
-  question2_words = {}
-  for word in str(row['question1']).lower().split():
-    if word not in STOPWORDS:
-      question1_words[word] = 1
-  for word in str(row['question2']).lower().split():
-    if word not in STOPWORDS:
-      question2_words[word] = 1
-  if len(question1_words) == 0 or len(question2_words) == 0:
-    # The computer-generated chaff includes a few questions that are nothing but stopwords
-    return 0
-  
-  shared_weights = [
-    weights.get(word, 0) for word in question1_words.keys() if word in question2_words # Share words with q2 in q1
-  ] + [
-    weights.get(word, 0) for word in question2_words.keys() if word in question1_words # Share words with q1 in q2
-  ]
-  total_weights = [
-    weights.get(word, 0) for word in question1_words
-  ] + [
-    weights.get(word, 0) for word in question2_words
-  ]
-  
-  return np.sum(shared_weights) / np.sum(total_weights)
-
-elapsed_millis = get_current_millis()
-# Step4. Reblancing data
+# Step1. Reblancing data
 # First we create our training and testing data
-X_train = pd.DataFrame()
-X_test = pd.DataFrame()
-X_train['word_match'] = train_data.apply(word_match_share, axis=1, raw=True)
-X_train['tfidf_word_match'] = train_data.apply(tfidf_word_match_share, axis=1, raw=True)
-X_test['word_match'] = test_data.apply(word_match_share, axis=1, raw=True)
-X_test['tfidf_word_match'] = test_data.apply(tfidf_word_match_share, axis=1, raw=True)
-
+time_logger.start()
+X_train = fe.get_features(train_data)
+X_test = fe.get_features(test_data)
 y_train = train_data['is_duplicate'].values
-
 pos_train = X_train[y_train == 1]
 neg_train = X_train[y_train == 0]
-print('Step4: Rebalancing data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+time_logger.log_with_elapse('Step1, Rebalancing data time:')
 
-elapsed_millis = get_current_millis()
-# Step5. Over sampling
+# Step2. Over sampling
 # Now we oversample the negative class
 # There is likely a much more elegant way to do this...
-p = 0.165
-scale = ((len(pos_train) / (len(pos_train) + len(neg_train))) / p) - 1
-while scale > 1:
-    neg_train = pd.concat([neg_train, neg_train])
-    scale -=1
-neg_train = pd.concat([neg_train, neg_train[:int(scale * len(neg_train))]])
-print(len(pos_train) / (len(pos_train) + len(neg_train)))
+time_logger.start()
+oversampler = OverSampler(pos_train, neg_train)
+X_train, y_train = oversampler.get_over_sample()
+time_logger.log_with_elapse('Step2, Over sampling time:')
 
-X_train = pd.concat([pos_train, neg_train])
-y_train = (np.zeros(len(pos_train)) + 1).tolist() + np.zeros(len(neg_train)).tolist()
-del pos_train, neg_train
-print('Step5: Over sampling time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
-
-elapsed_millis = get_current_millis()
-# Step6. Split train data to create validation data
+# Step3. Split train data to create validation data
 # Finally, we split some of the data off for validation
+time_logger.start()
 X_train, X_valid, y_train, y_valid = cross_validation.train_test_split(X_train, y_train, test_size=0.2, random_state=4242)
-print('Step6: Split validation data from train data time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+time_logger.log_with_elapse('Step3, Split validation data from train data time:')
 
-elapsed_millis = get_current_millis()
-# Step7. Run XGBoost algorithm.
-import xgboost as xgb
-
+# Step4. Run XGBoost algorithm.
+time_logger.start()
+xgb = XgbManager(X_train, X_valid, X_test, y_train, y_valid)
 # Set our parameters for xgboost
-params = {}
-params['objective'] = 'binary:logistic'
-params['eval_metric'] = 'logloss'
-params['eta'] = 0.02
-params['max_depth'] = 4
+params = {
+  'objective': 'binary:logistic',
+  'eval_metric': 'logloss',
+  'eta': 0.02,
+  'max_depth': 4,
+}
+# Set our options for xgboost
+options = {
+  'num_boost_round': 400,
+  'early_stopping_rounds': 50,
+  'verbose_eval': 10,
+}
+xgb.train(params, options)
+y_test = xgb.predict()
+time_logger.log_with_elapse('Step4, Run XGBoost time:')
 
-d_train = xgb.DMatrix(X_train, label=y_train)
-d_valid = xgb.DMatrix(X_valid, label=y_valid)
-
-watchlist = [(d_train, 'train'), (d_valid, 'valid')]
-
-bst = xgb.train(params, d_train, 400, watchlist, early_stopping_rounds=50, verbose_eval=10)
-
-d_test = xgb.DMatrix(X_test)
-p_test = bst.predict(d_test)
-
+# Step5. Make submission file.
+time_logger.start()
 sub = pd.DataFrame()
 sub['test_id'] = test_data['test_id']
-sub['is_duplicate'] = p_test
+sub['is_duplicate'] = y_test
 sub.to_csv(options.submission_file, index=False)
-print('Step7: Run XGBoost time:', get_elapsed_seconds(get_current_millis(), elapsed_millis))
+time_logger.log_with_elapse('Step5, Make submission time:')
 print('Done.')
