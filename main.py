@@ -15,13 +15,13 @@ from time_logger import TimeLogger
 from sklearn import cross_validation
 from xgb_manager import XgbManager
 
-options = parse_commands(sys.argv[1:])
+arguments = parse_commands(sys.argv[1:])
 time_logger = TimeLogger()
 
 # Step0. Gets train data and test data
 time_logger.start()
-train_data = pd.read_csv(options.train_file)
-test_data = pd.read_csv(options.test_file)
+train_data = pd.read_csv(arguments.train_file)
+test_data = pd.read_csv(arguments.test_file)
 train_questions = pd.Series(train_data['question1'].tolist() + train_data['question2'].tolist()).astype(str)
 test_questions = pd.Series(test_data['question1'].tolist() + test_data['question2'].tolist()).astype(str)
 time_logger.log_with_elapse('Step0, Get train, test data time:')
@@ -80,6 +80,6 @@ time_logger.start()
 sub = pd.DataFrame()
 sub['test_id'] = test_data['test_id']
 sub['is_duplicate'] = y_test
-sub.to_csv(options.submission_file, index=False)
+sub.to_csv(arguments.submission_file, index=False)
 time_logger.log_with_elapse('Step5, Make submission time:')
 print('Done.')
