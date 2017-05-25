@@ -7,7 +7,7 @@
 `$ docker build -t totoro/quora-nl-processing .`
 
 ### Run
-`$ docker run -d totoro/quora-nl-processing`
+`$ docker run -d -name quora-nl-processing totoro/quora-nl-processing`
 
 ### Connect shell 
 `$ docker exec -it totoro/quora-nl-processing /bin/bash`
@@ -22,3 +22,10 @@ $ docker info
 ```
 
 이때 Storage type이 overlag2로 변경되어있으면 성공이다. 이후 docker build를 재개하면 된다.
+
+## Project
+프로젝트를 실행하는 방법은 다음과 같다.
+`python main.py --trainFile /path/to/train.csv --testFile /path/to/test.csv --submissionFile /path/to/submission.csv`
+
+Background에서 실행시키려면 다음과 같이 nohup을 이용하면 된다.
+`nohup python main.py --trainFile /path/to/train.csv --testFile /path/to/test.csv --submissionFile /path/to/submission.csv > process.out &`
