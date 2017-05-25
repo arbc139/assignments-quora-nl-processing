@@ -7,10 +7,10 @@
 `$ docker build -t totoro/quora-nl-processing .`
 
 ### Run
-`$ docker run -d -name quora-nl-processing totoro/quora-nl-processing`
+`$ docker run -d --name=quora-nl-processing -d -v ~/quora-nl-processing/dataset:/home/jovyan/work/quora-nl-processing/dataset totoro/quora-nl-processing`
 
 ### Connect shell 
-`$ docker exec -it totoro/quora-nl-processing /bin/bash`
+`$ docker exec -it quora-nl-processing /bin/bash`
 
 ### Trouble shooting
 Build를 할 때, storage가 모자라는 에러가 뜨면 다음과 같이 해결하면 된다.
