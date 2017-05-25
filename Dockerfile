@@ -8,6 +8,3 @@ RUN pip install --upgrade pip
 RUN git clone https://github.com/arbc139/quora-nl-processing
 RUN cd quora-nl-processing; pip install -r requirements.txt
 RUN python -m nltk.downloader all
-
-EXPOSE 80
-CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
