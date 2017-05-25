@@ -8,15 +8,16 @@ class OverSampler():
     self.pos_train = pos_train
     self.neg_train = neg_train
   
-  def get_scale(self):
+  def get_scale(self, p):
     scale = len(self.pos_train)
     scale /= (len(self.pos_train) + len(self.neg_train))
-    scale /= p
+    if p != 0:
+      scale /= p
     scale -= 1
     return scale
   
   def get_over_sample(self, p=0.165):
-    scale = self.get_scale()
+    scale = self.get_scale(p)
     while scale > 1:
       self.neg_train = pd.concat([self.neg_train, self.neg_train])
       scale -=1
