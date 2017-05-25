@@ -61,14 +61,14 @@ class FeatureExtracter():
         # The computer-generated chaff includes a few questions that are nothing but stopwords
         return 0
       shared_weights = [
-        self.weights.get(word, 0) for word in question1_words.keys() if word in question2_words # Share words with q2 in q1
+        self.word_weights.get(word, 0) for word in question1_words.keys() if word in question2_words # Share words with q2 in q1
       ] + [
-        self.weights.get(word, 0) for word in question2_words.keys() if word in question1_words # Share words with q1 in q2
+        self.word_weights.get(word, 0) for word in question2_words.keys() if word in question1_words # Share words with q1 in q2
       ]
       total_weights = [
-        self.weights.get(word, 0) for word in question1_words
+        self.word_weights.get(word, 0) for word in question1_words
       ] + [
-        self.weights.get(word, 0) for word in question2_words
+        self.word_weights.get(word, 0) for word in question2_words
       ]
       return np.sum(shared_weights) / np.sum(total_weights)
     
