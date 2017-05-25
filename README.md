@@ -25,7 +25,10 @@ $ docker info
 
 ## Project
 프로젝트를 실행하는 방법은 다음과 같다.
-`python main.py --trainFile /path/to/train.csv --testFile /path/to/test.csv --submissionFile /path/to/submission.csv`
+`python main.py --trainFile dataset/input/quora/train.csv --testFile dataset/input/quora/test.csv --submissionFile dataset/output/quora/submission.csv`
 
 Background에서 실행시키려면 다음과 같이 nohup을 이용하면 된다.
-`nohup python main.py --trainFile /path/to/train.csv --testFile /path/to/test.csv --submissionFile /path/to/submission.csv > process.out &`
+`nohup python main.py --trainFile dataset/input/quora/train.csv --testFile dataset/input/quora/test.csv --submissionFile dataset/output/quora/submission.csv > running_log.out &`
+
+Docker로 바로 실행시키려면 다음과 같이 실행시키면 된다.
+`nohup docker exec -it quora-nl-processing (python /home/jovyan/work/quora-nl-processing/main.py --trainFile dataset/input/quora/train.csv --testFile dataset/input/quora/test.csv --submissionFile dataset/output/quora/submission.csv > running_log.out) &`

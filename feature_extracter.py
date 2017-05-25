@@ -22,7 +22,7 @@ class FeatureExtracter():
     # Step2. Calculates train word weights feature.
     self.word_weights = { word: get_weight(count) for word, count in counts.items() }
   
-  def get_features(data):
+  def get_features(self, data):
     X = pd.DataFrame()
 
     def shared_word_match(row):
