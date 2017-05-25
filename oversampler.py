@@ -22,9 +22,8 @@ class OverSampler():
       self.neg_train = pd.concat([self.neg_train, self.neg_train])
       scale -=1
     self.neg_train = pd.concat([self.neg_train, self.neg_train[:int(scale * len(self.neg_train))]])
-    neg_train = over_sampling_neg_train(pos_train, neg_train)
-    print(len(pos_train) / (len(pos_train) + len(neg_train)))
-    X_train = pd.concat([pos_train, neg_train])
-    y_train = (np.zeros(len(pos_train)) + 1).tolist() + np.zeros(len(neg_train)).tolist()
+    print(len(self.pos_train) / (len(self.pos_train) + len(self.neg_train)))
+    X_train = pd.concat([self.pos_train, self.neg_train])
+    y_train = (np.zeros(len(self.pos_train)) + 1).tolist() + np.zeros(len(self.neg_train)).tolist()
     return (X_train, y_train)
     
