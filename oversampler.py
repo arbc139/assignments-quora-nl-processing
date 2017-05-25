@@ -1,7 +1,7 @@
 
 import copy
-import pd
-import np
+import pandas as pd
+import numpy as np
 
 class OverSampler():
   def __init__(self, pos_train, neg_train):
