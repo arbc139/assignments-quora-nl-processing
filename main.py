@@ -1,19 +1,31 @@
 # This is refered by anokas's Data Analysis & XGBoost Starter (0.35460 LB)
 # https://www.kaggle.com/anokas/data-analysis-xgboost-starter-0-35460-lb
 
-import copy
 import nltk
 import numpy as np
 import pandas as pd
 import sys
 
 from collections import Counter
-from custom_library.utils import get_current_millis, get_elapsed_seconds, parse_commands
+from custom_library.utils import get_current_millis, get_elapsed_seconds
 from feature_extracter import FeatureExtracter
 from oversampler import OverSampler
 from time_logger import TimeLogger
 from sklearn import cross_validation
 from xgb_manager import XgbManager
+
+def parse_commands(argv):
+  from optparse import OptionParser
+  parser = OptionParser('"')
+  # Input file path
+  parser.add_option('--testFile', dest='test_file')
+  parser.add_option('--trainFile', dest='train_file')
+  parser.add_option('--wordVectorFile', dest='word_vector_file')
+  # Output file path
+  parser.add_option('--submissionFile', dest='submission_file')
+
+  options, otherjunk = parser.parse_args(argv)
+  return options
 
 arguments = parse_commands(sys.argv[1:])
 time_logger = TimeLogger()

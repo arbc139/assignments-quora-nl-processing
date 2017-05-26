@@ -1,3 +1,4 @@
+gensim
 pandas
 nltk
 numpy
