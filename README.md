@@ -7,7 +7,7 @@
 `$ docker build -t totoro/quora-nl-processing .`
 
 ### Run
-`$ docker run -d --name=quora-nl-processing -d -v ~/quora-nl-processing/dataset:/home/jovyan/work/quora-nl-processing/dataset totoro/quora-nl-processing`
+`$ docker run -d -p 8888:8888 --name=quora-nl-processing -v ~/quora-nl-processing/dataset:/home/jovyan/work/quora-nl-processing/dataset totoro/quora-nl-processing`
 
 ### Connect shell 
 `$ docker exec -it quora-nl-processing /bin/bash`

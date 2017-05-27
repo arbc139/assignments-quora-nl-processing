@@ -1,5 +1,7 @@
+import sys, os
+sys.path.append(os.path.abspath(".."))
 
-from csv_manager import CsvReader, CsvWriter
+from custom_library.csv_manager import CsvReader, CsvWriter
 
 test_data = None
 with open('dataset/test.csv', 'r') as test_file:
