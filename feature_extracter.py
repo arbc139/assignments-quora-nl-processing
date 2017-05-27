@@ -8,7 +8,6 @@ from custom_library.utils import get_word_vector, normalize_vector, cosine_dista
 
 stopwords = set(nltk.corpus.stopwords.words('english'))
 
-
 class FeatureExtracter():
   def __init__(self, train_questions, word_vector_model):
     words = (' '.join(train_questions)).lower().split()

@@ -50,7 +50,7 @@ time_logger.log_with_elapse('Step0, Get train, test data time:')
 
 fe = FeatureExtracter(train_questions, word_vector_model)
 
-# Step1. Reblancing data
+# Step1. Extract features
 # First we create our training and testing data
 time_logger.start()
 X_train = fe.get_features(train_data, refined_train_data)
