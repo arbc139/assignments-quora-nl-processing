@@ -89,7 +89,7 @@ class FeatureExtracter():
         question2_vector = np.add(question2_vector, get_word_vector(self.word_vector_model, word))
       normalized_question2_vector = normalize_vector(question2_vector)
       
-      return cosine_distance(sentence1_vector, sentence2_vector)
+      return cosine_distance(question1_vector, question2_vector)
 
     # Feature3. word vector similarity
     X['word_vector_similarity'] = refined_data.apply(word_vector_similarity, axis=1, raw=True)
