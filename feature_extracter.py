@@ -80,12 +80,12 @@ class FeatureExtracter():
 
     def word_vector_similarity(row):
       question1_vector = np.zeros(300)
-      for word in row['question1']:
+      for word in str(row['question1']).lower().split():
         question1_vector = np.add(question1_vector, get_word_vector(self.word_vector_model, word))
       normalized_question1_vector = normalize_vector(question1_vector)
       
       question2_vector = np.zeros(300)
-      for word in row['question2']:
+      for word in str(row['question2']).lower().split():
         question2_vector = np.add(question2_vector, get_word_vector(self.word_vector_model, word))
       normalized_question2_vector = normalize_vector(question2_vector)
       
