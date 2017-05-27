@@ -9,8 +9,6 @@ def parse_commands(argv):
   parser = OptionParser('"')
   # Input file path
   parser.add_option('-i', '--wordVectorFile', dest='word_vector_file')
-  # Output file path
-  
 
   options, otherjunk = parser.parse_args(argv)
   return options

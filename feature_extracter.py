@@ -4,11 +4,13 @@ import numpy as np
 import pandas as pd
 
 from collections import Counter
+from custom_library.utils import get_word_vector, normalize_vector, cosine_distance
 
 stopwords = set(nltk.corpus.stopwords.words('english'))
 
+
 class FeatureExtracter():
-  def __init__(self, train_questions):
+  def __init__(self, train_questions, word_vector_model):
     words = (' '.join(train_questions)).lower().split()
     counts = Counter(words)
     
@@ -21,8 +23,9 @@ class FeatureExtracter():
 
     # Step2. Calculates train word weights feature.
     self.word_weights = { word: get_weight(count) for word, count in counts.items() }
+    self.word_vector_model = word_vector_model
   
-  def get_features(self, data):
+  def get_features(self, data, refined_data):
     X = pd.DataFrame()
 
     def shared_word_match(row):
@@ -74,5 +77,21 @@ class FeatureExtracter():
     
     # Feature2. tf-idf word_weight feature.
     X['tfidf_word_match'] = data.apply(tfidf_word_match_weight, axis=1, raw=True)
+
+    def word_vector_similarity(row):
+      question1_vector = np.zeros(300)
+      for word in row['question1']:
+        question1_vector = np.add(question1_vector, get_word_vector(self.word_vector_model, word))
+      normalized_question1_vector = normalize_vector(question1_vector)
+      
+      question2_vector = np.zeros(300)
+      for word in row['question2']:
+        question2_vector = np.add(question2_vector, get_word_vector(self.word_vector_model, word))
+      normalized_question2_vector = normalize_vector(question2_vector)
+      
+      return cosine_distance(sentence1_vector, sentence2_vector)
+
+    # Feature3. word vector similarity
+    X['word_vector_similarity'] = refined_data.apply(word_vector_similarity, axis=1, raw=True)
 
     return X

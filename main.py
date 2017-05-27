@@ -1,6 +1,7 @@
 # This is refered by anokas's Data Analysis & XGBoost Starter (0.35460 LB)
 # https://www.kaggle.com/anokas/data-analysis-xgboost-starter-0-35460-lb
 
+import gensim
 import nltk
 import numpy as np
 import pandas as pd
@@ -20,6 +21,8 @@ def parse_commands(argv):
   # Input file path
   parser.add_option('--testFile', dest='test_file')
   parser.add_option('--trainFile', dest='train_file')
+  parser.add_option('--refinedTrainFile', dest='refined_train_file')
+  parser.add_option('--refinedTestFile', dest='refined_test_file')
   parser.add_option('--wordVectorFile', dest='word_vector_file')
   # Output file path
   parser.add_option('--submissionFile', dest='submission_file')
@@ -30,21 +33,28 @@ def parse_commands(argv):
 arguments = parse_commands(sys.argv[1:])
 time_logger = TimeLogger()
 
+# Step00. Gets word vector.
+time_logger.start()
+word_vector_model = gensim.models.KeyedVectors.load(arguments.word_vector_file)
+time_logger.log_with_elapse('Step00, Load word vector model time:')
+
 # Step0. Gets train data and test data
 time_logger.start()
 train_data = pd.read_csv(arguments.train_file)
 test_data = pd.read_csv(arguments.test_file)
+refined_train_data = pd.read_csv(arguments.refined_train_file)
+refined_test_data = pd.read_csv(arguments.refined_test_file)
 train_questions = pd.Series(train_data['question1'].tolist() + train_data['question2'].tolist()).astype(str)
 test_questions = pd.Series(test_data['question1'].tolist() + test_data['question2'].tolist()).astype(str)
 time_logger.log_with_elapse('Step0, Get train, test data time:')
 
-fe = FeatureExtracter(train_questions)
+fe = FeatureExtracter(train_questions, word_vector_model)
 
 # Step1. Reblancing data
 # First we create our training and testing data
 time_logger.start()
-X_train = fe.get_features(train_data)
-X_test = fe.get_features(test_data)
+X_train = fe.get_features(train_data, refined_train_data)
+X_test = fe.get_features(test_data, refined_test_data)
 y_train = train_data['is_duplicate'].values
 pos_train = X_train[y_train == 1]
 neg_train = X_train[y_train == 0]
