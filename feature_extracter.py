@@ -118,7 +118,7 @@ class FeatureExtracter():
       ]
       return np.sum(shared_weights) / np.sum(total_weights)
     X['tfidf_word_match_stop'] = data.apply(tfidf_word_match_weight_stop, axis=1, raw=True)
-
+"""
     # Feature4. word vector similarity
     def word_vector_similarity(row):
       question1_vector = np.zeros(300)
@@ -131,7 +131,7 @@ class FeatureExtracter():
       normalized_question2_vector = normalize_vector(question2_vector)
       return cosine_distance(question1_vector, question2_vector)
     X['word_vector_similarity'] = refined_data.apply(word_vector_similarity, axis=1, raw=True)
-
+"""
     # Feature etc..
     def jaccard(row):
       question1_words = str(row['question1']).lower().split()

@@ -94,7 +94,7 @@ options = {
   'verbose_eval': 50,
 }
 # Number of boosting iterations.
-num_boost_round = 5000
+num_boost_round = 3000
 xgb.train(params, options, num_boost_round)
 y_test = xgb.predict()
 time_logger.log_with_elapse('Step4, Run XGBoost time:')
