@@ -84,7 +84,7 @@ params = {
   'eta': 0.02,
   'max_depth': 15,
   'subsample': 0.6,
-  'base_score': 0.3,
+  'base_score': 0.2,
 }
 # Set our parametic options for xgboost
 options = {
