@@ -82,9 +82,9 @@ params = {
   'objective': 'binary:logistic',
   'eval_metric': 'logloss',
   'eta': 0.02,
-  'max_depth': 7,
+  'max_depth': 10,
   'subsample': 0.6,
-  'base_score': 0.2,
+  'base_score': 0.3,
 }
 # Set our parametic options for xgboost
 options = {
@@ -94,7 +94,7 @@ options = {
   'verbose_eval': 50,
 }
 # Number of boosting iterations.
-num_boost_round = 2500
+num_boost_round = 3500
 xgb.train(params, options, num_boost_round)
 y_test = xgb.predict()
 time_logger.log_with_elapse('Step4, Run XGBoost time:')

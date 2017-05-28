@@ -69,8 +69,6 @@ class FeatureExtracter():
       return (len(shared_words_in_q1) + len(shared_words_in_q2)) / (len(question1_words) + len(question2_words))
     X['word_match_stop'] = data.apply(shared_word_match, axis=1, raw=True)
 
-    
-
     # Feature2. tf-idf word_weight feature.
     def tfidf_word_match_weight(row):
       question1_words = {}
