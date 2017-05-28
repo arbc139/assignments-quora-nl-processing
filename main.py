@@ -71,7 +71,7 @@ time_logger.log_with_elapse('Step2, Over sampling time:')
 # Step3. Split train data to create validation data
 # Finally, we split some of the data off for validation
 time_logger.start()
-X_train, X_valid, y_train, y_valid = cross_validation.train_test_split(X_train, y_train, test_size=0.2, random_state=4242)
+X_train, X_valid, y_train, y_valid = cross_validation.train_test_split(X_train, y_train, test_size=0.1, random_state=4242)
 time_logger.log_with_elapse('Step3, Split validation data from train data time:')
 
 # Step4. Run XGBoost algorithm.
