@@ -251,6 +251,6 @@ class FeatureExtracter():
         return l2 / l1
       else:
         return l1 / l2
-    X['char_ratio'] = data.apply(char_dchar_ratioiff, axis=1, raw=True)
+    X['char_ratio'] = data.apply(char_ratio, axis=1, raw=True)
 
     return X
