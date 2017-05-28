@@ -49,6 +49,28 @@ class FeatureExtracter():
       return (len(shared_words_in_q1) + len(shared_words_in_q2)) / (len(question1_words) + len(question2_words))
     X['word_match'] = data.apply(shared_word_match, axis=1, raw=True)
 
+    # Feature1. Shard word match feature without stopwords.
+    def shared_word_match_stop(row):
+      question1_words = {}
+      question2_words = {}
+      for word in str(row['question1']).lower().split():
+        question1_words[word] = 1
+      for word in str(row['question2']).lower().split():
+        question2_words[word] = 1
+      if len(question1_words) == 0 or len(question2_words) == 0:
+        # The computer-generated chaff includes a few questions that are nothing but stopwords
+        return 0
+      shared_words_in_q1 = [
+        word for word in question1_words.keys() if word in question2_words
+      ]
+      shared_words_in_q2 = [
+        word for word in question2_words.keys() if word in question1_words
+      ]
+      return (len(shared_words_in_q1) + len(shared_words_in_q2)) / (len(question1_words) + len(question2_words))
+    X['word_match_stop'] = data.apply(shared_word_match, axis=1, raw=True)
+
+    
+
     # Feature2. tf-idf word_weight feature.
     def tfidf_word_match_weight(row):
       question1_words = {}
@@ -73,8 +95,8 @@ class FeatureExtracter():
       return np.sum(shared_weights) / np.sum(total_weights)
     X['tfidf_word_match'] = data.apply(tfidf_word_match_weight, axis=1, raw=True)
 
-    # Feature2. tf-idf word_weight feature. (stopwords)
-    def tfidf_word_match_weight(row):
+    # Feature3. tf-idf word_weight feature without stopwords.
+    def tfidf_word_match_weight_stop(row):
       question1_words = {}
       question2_words = {}
       for word in str(row['question1']).lower().split():
@@ -97,9 +119,9 @@ class FeatureExtracter():
         self.word_weights.get(word, 0) for word in question2_words
       ]
       return np.sum(shared_weights) / np.sum(total_weights)
-    X['tfidf_word_match_stop'] = data.apply(tfidf_word_match_weight, axis=1, raw=True)
+    X['tfidf_word_match_stop'] = data.apply(tfidf_word_match_weight_stop, axis=1, raw=True)
 
-    # Feature3. word vector similarity
+    # Feature4. word vector similarity
     def word_vector_similarity(row):
       question1_vector = np.zeros(300)
       for word in str(row['question1']).lower().split():
@@ -112,12 +134,7 @@ class FeatureExtracter():
       return cosine_distance(question1_vector, question2_vector)
     X['word_vector_similarity'] = refined_data.apply(word_vector_similarity, axis=1, raw=True)
 
-    # Feature4. char diff unique
-    def char_diff_unique_stop(row, stops=stopwords):
-      return abs(len(''.join([x for x in set(row['question1']) if x not in stops])) - len(''.join([x for x in set(row['question2']) if x not in stops])))
-    X['char_diff_unique_stop'] = data.apply(char_diff_unique_stop, axis=1, raw=True)
-
-    # Feature5. jaccard distance
+    # Feature etc..
     def jaccard(row):
       wic = set(row['question1']).intersection(set(row['question2']))
       uw = set(row['question1']).union(row['question2'])
@@ -126,22 +143,18 @@ class FeatureExtracter():
       return (len(wic) / len(uw))
     X['jaccard'] = data.apply(jaccard, axis=1, raw=True)
 
-    # Feature6. Common words
     def common_words(row):
       return len(set(row['question1']).intersection(set(row['question2'])))
     X['common_words'] = data.apply(common_words, axis=1, raw=True)
 
-    # Feature7. total unique words
     def total_unique_words(row):
       return len(set(row['question1']).union(row['question2']))
     X['total_unique_words'] = data.apply(total_unique_words, axis=1, raw=True)
 
-    # Feature8. total unique words stop
     def total_unique_words_stop(row, stops=stopwords):
       return len([x for x in set(row['question1']).union(row['question2']) if x not in stops])
     X['total_unique_words_stop'] = data.apply(total_unique_words_stop, axis=1, raw=True)
 
-    # Anything else features...
     def wc_diff(row):
       return abs(len(row['question1']) - len(row['question2']))
     X['wc_diff'] = data.apply(wc_diff, axis=1, raw=True)
@@ -196,6 +209,10 @@ class FeatureExtracter():
     def char_diff(row):
       return abs(len(''.join(row['question1'])) - len(''.join(row['question2'])))
     X['char_diff'] = data.apply(char_diff, axis=1, raw=True)
+    
+    def char_diff_unique_stop(row, stops=stopwords):
+      return abs(len(''.join([x for x in set(row['question1']) if x not in stops])) - len(''.join([x for x in set(row['question2']) if x not in stops])))
+    X['char_diff_unique_stop'] = data.apply(char_diff_unique_stop, axis=1, raw=True)
 
     def char_ratio(row):
       l1 = len(''.join(row['question1'])) 
