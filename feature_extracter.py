@@ -136,32 +136,44 @@ class FeatureExtracter():
 
     # Feature etc..
     def jaccard(row):
-      wic = set(row['question1']).intersection(set(row['question2']))
-      uw = set(row['question1']).union(row['question2'])
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      wic = set(question1_words).intersection(question2_words)
+      uw = set(question1_words).union(question2_words)
       if len(uw) == 0:
           uw = [1]
       return (len(wic) / len(uw))
     X['jaccard'] = data.apply(jaccard, axis=1, raw=True)
 
     def common_words(row):
-      return len(set(row['question1']).intersection(set(row['question2'])))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return len(set(question1_words).intersection(set(question2_words)))
     X['common_words'] = data.apply(common_words, axis=1, raw=True)
 
     def total_unique_words(row):
-      return len(set(row['question1']).union(row['question2']))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return len(set(question1_words).union(question2_words))
     X['total_unique_words'] = data.apply(total_unique_words, axis=1, raw=True)
 
     def total_unique_words_stop(row, stops=stopwords):
-      return len([x for x in set(row['question1']).union(row['question2']) if x not in stops])
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return len([x for x in set(question1_words).union(question2_words) if x not in stops])
     X['total_unique_words_stop'] = data.apply(total_unique_words_stop, axis=1, raw=True)
 
     def wc_diff(row):
-      return abs(len(row['question1']) - len(row['question2']))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return abs(len(question1_words) - len(question2_words))
     X['wc_diff'] = data.apply(wc_diff, axis=1, raw=True)
 
     def wc_ratio(row):
-      l1 = len(row['question1'])*1.0 
-      l2 = len(row['question2'])
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      l1 = len(question1_words)*1.0 
+      l2 = len(question2_words)
       if l2 == 0:
         return np.nan
       if l1 / l2:
@@ -171,12 +183,16 @@ class FeatureExtracter():
     X['wc_ratio'] = data.apply(wc_ratio, axis=1, raw=True)
 
     def wc_diff_unique(row):
-      return abs(len(set(row['question1'])) - len(set(row['question2'])))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return abs(len(set(question1_words)) - len(set(question2_words)))
     X['wc_diff_unique'] = data.apply(wc_diff_unique, axis=1, raw=True)
 
     def wc_ratio_unique(row):
-      l1 = len(set(row['question1'])) * 1.0
-      l2 = len(set(row['question2']))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      l1 = len(set(question1_words)) * 1.0
+      l2 = len(set(question2_words))
       if l2 == 0:
         return np.nan
       if l1 / l2:
@@ -186,12 +202,16 @@ class FeatureExtracter():
     X['wc_ratio_unique'] = data.apply(wc_ratio_unique, axis=1, raw=True)
 
     def wc_diff_unique_stop(row, stops=stopwords):
-      return abs(len([x for x in set(row['question1']) if x not in stops]) - len([x for x in set(row['question2']) if x not in stops]))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return abs(len([x for x in set(question1_words) if x not in stops]) - len([x for x in set(question2_words) if x not in stops]))
     X['wc_diff_unique_stop'] = data.apply(wc_diff_unique_stop, axis=1, raw=True)
 
     def wc_ratio_unique_stop(row, stops=stopwords):
-      l1 = len([x for x in set(row['question1']) if x not in stops])*1.0 
-      l2 = len([x for x in set(row['question2']) if x not in stops])
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      l1 = len([x for x in set(question1_words) if x not in stops])*1.0 
+      l2 = len([x for x in set(question2_words) if x not in stops])
       if l2 == 0:
         return np.nan
       if l1 / l2:
@@ -201,22 +221,30 @@ class FeatureExtracter():
     X['wc_ratio_unique_stop'] = data.apply(wc_ratio_unique_stop, axis=1, raw=True)
 
     def same_start_word(row):
-      if not row['question1'] or not row['question2']:
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      if not question1_words or not question2_words:
         return np.nan
-      return int(row['question1'][0] == row['question2'][0])
+      return int(question1_words[0] == question2_words[0])
     X['same_start_word'] = data.apply(same_start_word, axis=1, raw=True)
 
     def char_diff(row):
-      return abs(len(''.join(row['question1'])) - len(''.join(row['question2'])))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return abs(len(''.join(question1_words)) - len(''.join(question2_words)))
     X['char_diff'] = data.apply(char_diff, axis=1, raw=True)
     
     def char_diff_unique_stop(row, stops=stopwords):
-      return abs(len(''.join([x for x in set(row['question1']) if x not in stops])) - len(''.join([x for x in set(row['question2']) if x not in stops])))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      return abs(len(''.join([x for x in set(question1_words) if x not in stops])) - len(''.join([x for x in set(question2_words) if x not in stops])))
     X['char_diff_unique_stop'] = data.apply(char_diff_unique_stop, axis=1, raw=True)
 
     def char_ratio(row):
-      l1 = len(''.join(row['question1'])) 
-      l2 = len(''.join(row['question2']))
+      question1_words = str(row['question1']).lower().split()
+      question2_words = str(row['question2']).lower().split()
+      l1 = len(''.join(question1_words)) 
+      l2 = len(''.join(question2_words))
       if l2 == 0:
         return np.nan
       if l1 / l2:
